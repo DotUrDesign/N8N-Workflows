@@ -1,0 +1,505 @@
+{
+  "name": "Cold Email Automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "360ff9a5-fdfa-4d62-aceb-ba6ebbad7b8f",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1azdO4SqTXVUfbSWh17OPU3HA61UJlVnDYvF-3-yt80M",
+          "mode": "list",
+          "cachedResultName": "automated task",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1azdO4SqTXVUfbSWh17OPU3HA61UJlVnDYvF-3-yt80M/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Cold mailing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1azdO4SqTXVUfbSWh17OPU3HA61UJlVnDYvF-3-yt80M/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "c87f6f0b-9726-4e4a-a03c-2ad423814985",
+      "name": "Read Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        592
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ibYzd24FsYNIi3TC",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isEmpty"
+              }
+            },
+            {
+              "id": "2",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": null,
+              "operator": {
+                "type": "any",
+                "operation": "notExists"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "48a098aa-6f24-41b1-9670-9147c0055fac",
+      "name": "Check Status",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1136,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Data Engineer (2+ YOE) | Scalable Data Pipelines, Spark, Azure",
+        "emailType": "text",
+        "message": "Hi Sir/Ma'am,\n\nI hope you're doing well.\n\nMy name is Pratyush Sahoo, and I'm a Data Engineer with 2+ years of experience building scalable data platforms using Spark, PySpark, and Azure (ADF, Databricks).\n\nIn my current role, I work on high-volume financial systems processing 4–5M+ records per day, where I've developed metadata-driven ETL/ELT pipelines and improved Delta Lake performance by ~80%.\n\nI'm keen on solving large-scale data engineering problems and would appreciate it if you could consider my profile for any current or upcoming Data Engineering opportunities within your organization.\n\nPlease find my resume here:\nhttps://drive.google.com/file/d/17LIs1fmbDUHGa6x1PsfApECY1RQ8y_uS/view?usp=sharing\n\nFeel free to reach out at pratyush.sahoo2k26@gmail.com\n\nThank you for your time and consideration. I look forward to hearing from you.\n\nBest regards,\nPratyush Sahoo",
+        "options": {}
+      },
+      "id": "211bb274-3719-4267-9056-bd0603cbbbca",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1584,
+        112
+      ],
+      "webhookId": "09db4df9-f76d-40e7-9965-e3c2f3aaaa36",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "2Y4q4nSI7LTdS0w1",
+          "name": "Gmail OAuth2 API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $(\"Read Google Sheet\").params.documentId.value }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $(\"Read Google Sheet\").params.sheetName.value }}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $json[\"Email\"] }}",
+            "Status": "SENT"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9ce6d516-aa97-4307-819d-7e7a07cbd706",
+      "name": "Update Status - SENT",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1808,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ibYzd24FsYNIi3TC",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "69c943ca-a0da-4b3f-9a01-5208b618eec9",
+      "name": "Wait 5 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2032,
+        376
+      ],
+      "webhookId": "8b7004a6-1d14-4869-901b-6587dd784b13"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f5f519d9-d4a7-4310-8b20-de9eeabe74ce",
+      "name": "Loop Over Rows",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        688,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "skipped",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "fc8bad43-4bf4-49a8-bab1-0fb0742f92f2",
+      "name": "Skip Row",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1360,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json[\"Email\"] && $json[\"Email\"].includes(\"@\") }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "5f292f03-9c89-454e-8d54-d741e42c81c8",
+      "name": "Validate Email",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        912,
+        304
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $(\"Read Google Sheet\").params.documentId.value }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $(\"Read Google Sheet\").params.sheetName.value }}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $json[\"Email\"] }}",
+            "Status": "FAILED"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d676e70a-3340-4793-b49c-f1132959acc6",
+      "name": "Update Status - FAILED",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1136,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ibYzd24FsYNIi3TC",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "Email",
+              "value": "={{ $json[\"Email\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "033e60e1-1bb2-44bf-964e-3cb3d4032ff2",
+      "name": "Preserve Email Field",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1360,
+        112
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Status": {
+      "main": [
+        [
+          {
+            "node": "Preserve Email Field",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Update Status - SENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status - SENT": {
+      "main": [
+        [
+          {
+            "node": "Wait 5 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 Seconds": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Rows": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Validate Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip Row": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Email": {
+      "main": [
+        [
+          {
+            "node": "Check Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Status - FAILED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status - FAILED": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preserve Email Field": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3055e18b-30ea-4e81-99da-6df709596dc0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9056a1a714cc65905d38940807b77377bd7ad08d7eb0f8414fa294b5aea8183c"
+  },
+  "id": "v4EQQ71PvRI6RPHc",
+  "tags": []
+}
